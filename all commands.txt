@@ -1,0 +1,95 @@
+===============================
+# to show all the files, which are loaded
+dbutils.fs.ls("/FileStore/tables")
+
+# pyspark function
+from pyspark.sql.functions import *
+# URL processing
+import urllib
+----------------------
+# Define file type
+file_type = "csv"
+
+# whether the file has a header
+first_row_is_header = "true"
+
+# Delimiter used in the file
+delimiter = ","
+
+# read csv file to spark dataframe
+aws_keys_df = spark.read.format(file_type).option("header",first_row_is_header).option("sep",delimiter).load("")
+
+
+
+
+----------------------
+# get the AWS access and secret key from AWS dataframe
+ACCESS_KEY = aws_keys_df.where(col('User name') == 'Databricks_user').select('Access key ID').collect()[0]['Access key ID']
+SECRET_KEY = aws_keys_df.where(col('User name') == 'Databricks_user').select('Secret access key').collect()[0]['Secret access key']
+
+# Encode the secret key
+ENCODED_SECRET_KEY = urllib.parse.quote(string=SECRET_KEY, safe="")
+--------------------------------------
+
+# AWS S3 bucket name
+AWS_S3_BUCKET = "world-covid-dataset"
+
+# Mount name for the bucket
+MOUNT_NAME = "/mnt/world-covid-dataset"
+
+# Source URL
+SOURCE_URL = "s3n://{0}:{1}@{2}".format(ACCESS_KEY, ENCODED_SECRET_KEY, AWS_S3_BUCKET)
+
+# Mount the driver
+dbutils.fs.mount(SOURCE_URL, MOUNT_NAME)
+
+---------------------
+# trying to fetch the details from S3
+%fs ls /mnt/world-covid-dataset/
+
+--------------------
+# creating the pyspark dataframe, after reading the data from S3
+
+# File Location and type
+file_location = "/mnt/world-covid-dataset/country_vaccinations.csv"
+file_type = "csv"
+
+#CSV options
+infer_schema = "true"
+first_row_is_header = "true"
+delimiter = ","
+
+# The applied options are for CSV files. For other file types, these will be ignored.
+df = spark.read.format(file_type) \
+	.option("inferSchema"infer_schema,) \
+	.option("header",first_row_is_header) \
+	.option("sep", delimiter) \
+	.load(file_location)
+# displaying the data
+display(df)
+
+----------------------
+# command to used to save the spark dataframe into permanent table in database
+df.write.mode("overwrite").saveAsTable("employee")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
