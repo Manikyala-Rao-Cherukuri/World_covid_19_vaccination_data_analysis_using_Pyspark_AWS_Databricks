@@ -7,3 +7,5 @@ This project involves analysing the world covid-19 vaccination data using Pyspar
 - I have uploaded covid-19 data to tableau and created the dashboard to distinguish the vaccination data over multiple countries. This the public dashboard link
 #### Key Technologies/ Skills: 
 Python, Pyspark, SparkSQL, Databricks, Tableau, Aws – S3, IAM.
+
+![Final Dashboard](https://user-images.githubusercontent.com/119756215/233631296-d4393143-0f82-4694-9ad2-dd5d60c79395.png)
